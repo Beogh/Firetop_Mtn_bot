@@ -1,10 +1,4 @@
 armour
 lantern
 Potion of Strength
-dragonfire
-magic shield
-enchanted sword
-crucifix
-book
-Y-shaped stick
-Potion of Strength
+
