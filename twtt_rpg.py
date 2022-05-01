@@ -1226,6 +1226,8 @@ def create_normal_room(room_entered):
     global chosen_difficulty
     global current_personality
     global potion_chosen
+    global past_rooms
+    global current_stamina
     status_choices = ['Stay focused here.', 'Maybe you should turn back, before things get worse.',
                       'Contemplation, not hesitation.', 'This reminds you of a funny story.',
                       'You whistle a jaunty tune.', 'You whistle a light tune.', 'You feel a bit lost.',
@@ -1242,17 +1244,23 @@ def create_normal_room(room_entered):
                     'If I recall correctly...', 'Oh! I think I know this one!', 'What was the right choice again?',
                     'Which one is this?', 'Have you been here before?', 'You rack your brain for what to do.',
                     'No false moves here.', 'Did you write down what to do here?', 'Can you really...?']
-    # status_update = ''
+    status_update = ''
     # poll_update = ''
     if room_entered == 1:
         status_update = 'You are a ' + str(current_personality) + ' with a ' + str(potion_chosen) + ' playing on ' + \
                         str(chosen_difficulty) + '. ' 'You steel your resolve, check all your ' \
-                                                 'equipment and venture into the dungeon.'
+                                                 'equipment and venture into the mountain.'
         poll_update = 'The first choice, perhaps the most important?'
     else:
         if room_entered == 66:
             lose_stamina(2, room_entered, '')
-        status_update = random.choice(status_choices)
+        if room_entered == 293:
+            populate_past_rooms()
+            if str(65) in past_rooms:
+                lose_stamina(2, room_entered, '')
+                status_update = status_update + ' You escape, but take 2 damage. You now have ' + \
+                                                str(current_stamina) + ' stamina remaining.'
+        status_update = status_update + random.choice(status_choices)
         poll_update = random.choice(poll_choices)
     create_poll_tweet(room_entered, status_update, poll_update)
 
