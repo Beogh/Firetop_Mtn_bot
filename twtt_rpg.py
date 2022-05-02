@@ -1227,7 +1227,11 @@ def create_normal_room(room_entered):
     global current_personality
     global potion_chosen
     global past_rooms
+    global current_skill
     global current_stamina
+    global current_luck
+    global current_gold
+    global current_provisions
     status_choices = ['Stay focused here.', 'Maybe you should turn back, before things get worse.',
                       'Contemplation, not hesitation.', 'This reminds you of a funny story.',
                       'You whistle a jaunty tune.', 'You whistle a light tune.', 'You feel a bit lost.',
@@ -1236,7 +1240,10 @@ def create_normal_room(room_entered):
                       'How long have you been down here?', 'How big is this place?', 'What a day!',
                       'Will this place be the end of you?', "It feels like there's a frog in your throat.",
                       'Things could be better, but they could certainly be much worse too.',
-                      'Your thoughts turn briefly to your family.', "You're starting to regret coming here."]
+                      'Your thoughts turn briefly to your family.', "You're starting to regret coming here.",
+                      'You have ' + str(current_stamina) + ' stamina.', 'You have ' + str(current_skill) + ' skill.',
+                      'You have ' + str(current_luck) + ' luck.', 'You have ' + str(current_gold) + ' gold.',
+                      'You have ' + str(current_provisions) + ' provisions.']
     poll_choices = ['This one feels extra important.', 'What would your deity do?', 'Which one is right?',
                     'Dizzy with choices, you clear your head and choose with determination.',
                     'You mentally toss a coin and choose.', 'It feels like the fates guide you towards your choice.',
@@ -2098,15 +2105,17 @@ def create_special_passage_room(room_entered):
         create_poll_tweet(room_entered, status_update, poll_status)
     # gain gold and the invis potion, and may eat, then a poll
     if room_entered in [201]:
-        gain_gold(5)
+        gain_gold(25)
         items.append('potion of invisibility')
         hunger_result = check_to_eat()
         if hunger_result == 'hungry':
             eat_provisions()
-            status_update = 'You eat some rations, bringing your stamina to ' + str(current_stamina) + '. '
+            status_update = 'You eat some rations, bringing your stamina to ' + str(current_stamina) + '. You have ' \
+                            + str(current_provisions) + ' provisions remaining.'
             poll_status = 'To the north, or eastwards?'
         else:
-            status_update = "You aren't hungry enough to eat. You stow your new potion. "
+            status_update = "You aren't hungry enough to eat. You have " + str(current_stamina) + 'stamina and ' \
+                            + str(current_provisions) + ' provisions remaining.' + " You stow your new potion. "
             poll_status = 'Which direction do you feel in your bones?'
         status_update = status_update + 'You now have ' + str(current_gold) + ' gold.'
         create_poll_tweet(room_entered, status_update, poll_status)
