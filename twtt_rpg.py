@@ -1913,9 +1913,11 @@ def create_special_passage_room(room_entered):
         if len(items) == 0:
             if current_gold >= 1:
                 status_update = 'you have no suitable items, so you toss a gold.'
+                modify_gold(-1)
             if current_gold <= 0:
                 status_update = "you haven't any gold or items, by GM fiat you find a suitable rock."
             create_media_tweet(room_entered, status_update)
+            set_current_room(269)
         elif len(items) > 4:
             throwables = []
             while len(throwables) < 4:
@@ -2924,6 +2926,19 @@ def handle_special_results(result):
         initialize_potion_choice()
         set_current_room(1)
         play_next_room(1)
+    # passage 119 has you throwing something to distract the ogre
+    elif result in items:
+        items.remove(result)
+        status_update = 'You toss the ' + str(result) + ' to the far side of the cavern and quickly retreat. ' \
+                                                        'You still have:'
+        for each_item in items:
+            if each_item not in ['armour']:
+                status_update = status_update + ' A ' + str(each_item) + '.'
+            elif each_item in ['armour']:
+                status_update = status_update + ' An ' + str(each_item) + '.'
+        poll_status = 'Your heart is racing after escaping the ogre, take a moment to catch your breath ' \
+                      'and consider the next junction.'
+        create_poll_tweet(269, status_update, poll_status)
 
 
 def initialize_character_personality():
@@ -3416,6 +3431,7 @@ def new_run_game():
 def next_step(chosen_room):
     global current_room
     global last_tweet_id
+    global items
     set_character_stats()
     set_items_and_keys()
     if chosen_room == '0':
@@ -3434,7 +3450,7 @@ def next_step(chosen_room):
             results = get_poll_results(last_tweet_id)
         else:
             results = chosen_room
-        if results in ['fight on!', 'Test your luck!']:
+        if results in ['fight on!', 'Test your luck!'] or items:
             handle_special_results(results)
         else:
             results = int(results)
