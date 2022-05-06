@@ -1303,7 +1303,7 @@ def create_provisions_dependent_room(room_entered):
             eat_provisions()
             status_update = 'You eat some provisions. With ' + str(current_provisions) + ' left, you think about ' \
                                                                                          "what's next."
-        if hunger == 'not hungry':
+        elif hunger == 'not hungry':
             baseline_stamina = initial_stamina - 4
             if current_provisions == 0:
                 status_update = 'With no more food, you cannot eat. Your stomach rumbles.'
@@ -3451,7 +3451,7 @@ def next_step(chosen_room):
             results = get_poll_results(last_tweet_id)
         else:
             results = chosen_room
-        if results in ['fight on!', 'Test your luck!'] or items:
+        if results in ['fight on!', 'Test your luck!'] or results in items:
             handle_special_results(results)
         else:
             results = int(results)
