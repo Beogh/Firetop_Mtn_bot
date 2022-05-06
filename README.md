@@ -3,7 +3,8 @@ It updates every 6 hours and typically reads a poll then spits out the next even
 
 ## **What is The Warlock of Firetop Mountain?**
 It's a book, originally published in 1982 by Steve Jackson and Ian Livingstone. The Warlock of Firetop Mountain launched the Fighting Fantasy series, a collection of books that tried to build off "choose your own adventure" ideas and turn them into a full self-played game. Players have a character sheet that tracks stats and items, and make choices that determine their path through the passages, with one particular path giving the best ending.
-## **FAQ**
+
+# **FAQ**
 **Who made this?**
 
 This bot was created by user @digitalmaxine on twitter.
@@ -31,7 +32,7 @@ When there is a tie between results, the bot will choose one of the winners at r
 
 
 
-## **Rules of the Game:**
+# **Rules of the Game:**
 
 The character, controlled by all players via twitter poll, starts with several stats determined by their difficulty/class. These stats are the following:
 
@@ -45,8 +46,113 @@ The character, controlled by all players via twitter poll, starts with several s
 
 **Provisions**: Normally restore Stamina by 4, and can only be eaten at certain safe locations. Running out of provisions doesn't mean you'll starve to death, but it does make survival that much less likely.
 
+# **Difficulty and Classes**
+
+There are four each of difficulties and classes. They are listed below with their mechanical adjustments.
+
+## **Difficulties**
+The chosen difficulty only modifies a characters initial stats. It does not change enemy or character behavior.
+
+### **Easy**
+Skill: 11
+
+Stamina: 18
+
+Luck: 11
+
+Gold: 0
+
+Provisions: 10
 
 
+### **Medium**
+Skill: 10
+
+Stamina: 16
+
+Luck: 10
+
+Gold: 0
+
+Provisions: 9
+
+
+### **Hard**
+Skill: 9
+
+Stamina: 15
+
+Luck: 8
+
+Gold: 0
+
+Provisions: 7
+
+
+### **Very Hard**
+Skill: 8
+
+Stamina: 14
+
+Luck: 8
+
+Gold: 0
+
+Provisions: 6
+
+
+
+## **Classes**
+The chosen class will potentially modify initial stats, and determines behavior. All classes will not flee if their stamina is 2 or below, as the fleeing penalty will kill them.
+
+### **Soldier**
+Stat changes: None
+
+Flees: If the foe has 4, or more, skill higher than the character and can be fled from.
+
+Tests luck in combat: 
+
+-When attacking: Only if luck is above 8 (or 5 if current stamina is below 5) and the enemy has an odd (as opposed to "even") stamina, and your own skill is less than 2 above the enemies skill. So foes with skill above the soldier will trigger this.
+
+-When defending: Only if current stamina is even (as opposed to "odd") and luck is 10 or higher and enemy skill is at least 2 above character skill.
+
+### **Cook**
+Stat changes: +4 starting provisions, +3 starting gold
+
+Flees: If the enemy has higher skill and can be fled from.
+
+Tests luck in combat: 
+
+-When attacking: if the foe has odd stamina, and current luck is at least 10, and current skill is less than 4 above the foes skill.
+
+-When defending: Only if luck is above 10 and taking the reduced damage would put the character at an odd stamina value
+
+### **Berserker**
+Stat changes: +1 skill
+
+Flees: Only if the enemy has 6, or more, skill above the character, and they can be fled from.
+
+Tests luck in combat: 
+
+-When attacking: Only when above 8 luck, and doing so would reduce enemy stamina to a multiple of 2, and enemy is higher skill than the character.
+
+-When defending: Never
+
+Special: If the berserker would die, instead test luck + 4, and if lucky then they survive at 1 stamina. This test reduces luck.
+
+### **Noble**
+Stat changes: +6 gold
+
+Flees: If the foe has 4, or more, skill higher than the character and can be fled from.
+
+Tests luck in combat: 
+
+-When attacking: If the foe has a higher skill, and the character has at least 11 luck, and the attack would reduce enemy stamina to an even number.
+
+-When defending: If luck is at least 7, and enemy has greater skill than the character.
+
+
+______________________________
 In addition, the player is given a choice of which potion you would like to start with. Each potion has two measures, and unlike later Fighting Fantasy games they may be quaffed even during combat. They are listed here:
 
 Skill: Potion of Skill restores your Skill to full.
