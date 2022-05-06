@@ -2939,6 +2939,7 @@ def handle_special_results(result):
         poll_status = 'Your heart is racing after escaping the ogre, take a moment to catch your breath ' \
                       'and consider the next junction.'
         create_poll_tweet(269, status_update, poll_status)
+        set_current_room(269)
 
 
 def initialize_character_personality():
