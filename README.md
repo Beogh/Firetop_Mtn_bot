@@ -1,5 +1,5 @@
 Firetop Mountain Bot is a python bot created by @digitlamaxine to play through The Warlock of Firetop Mountain on twitter. 
-It updates every 6 hours and typically reads a poll then spits out the next events.
+It updates thrice daily and typically reads a poll then spits out the next events.
 
 ## **What is The Warlock of Firetop Mountain?**
 It's a book, originally published in 1982 by Steve Jackson and Ian Livingstone. The Warlock of Firetop Mountain launched the Fighting Fantasy series, a collection of books that tried to build off "choose your own adventure" ideas and turn them into a full self-played game. Players have a character sheet that tracks stats and items, and make choices that determine their path through the passages, with one particular path giving the best ending.
