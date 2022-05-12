@@ -1,3 +1,4 @@
+# fix the second run through of passage 212 to generate the correct images.
 import tweepy
 from secrets import *
 from player_stats import *
@@ -1213,7 +1214,7 @@ def create_media_tweet(room_entered, tweet_status):
     for image in glob.glob(str(total_path)):
         uploaded_image = api.media_upload(image)
         media_id_list.append(uploaded_image.media_id)
-    if room_entered in fight_dependent_rooms:
+    if room_entered in fight_dependent_rooms or room_entered in random_fight_rooms:
         uploaded_image = api.media_upload('fight_result.jpg')
         media_id_list.append(uploaded_image.media_id)
     media_tweet = client.create_tweet(text=status_update, media_ids=media_id_list)
@@ -1445,10 +1446,11 @@ def create_provisions_dependent_room(room_entered):
 
 def create_random_fight_room(room_entered):
     # multiple choices after fighting 161
+    global monster_dictionary
     if room_entered in [12]:
         # options = random_fight_room_choices[room_entered]
         monster = fight_room_161()
-        status_update = 'You defeat the ' + monster + '!'
+        status_update = 'You defeat the ' + monster_dictionary[monster][2] + '!'
         create_poll_tweet(room_entered, status_update, 'Where to next?')
     # one choice after fighting 161
     if room_entered in [14, 161, 234, 295, 306]:
