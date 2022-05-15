@@ -2844,6 +2844,11 @@ def get_poll_results(poll_id):
         if challenger > to_beat:
             victor = poll_choice['label']
             to_beat = challenger
+        elif challenger == to_beat:
+            replace_chance = random.randint(1, 6)
+            if replace_chance >= 3:
+                victor = poll_choice['label']
+                to_beat = challenger
     if to_beat == 0:
         victor = poll_results_total[random.randint(0, len(poll_results_total) - 1)]['label']
     return victor
