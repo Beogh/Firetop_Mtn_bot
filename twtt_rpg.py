@@ -342,12 +342,12 @@ def adjust_stats_based_on_personality():
     global initial_skill
     if current_personality == 'Cook':
         current_provisions += 4
-        gain_gold(3)
+        modify_gold(3)
     elif current_personality == 'Berserker':
         initial_skill += 1
         modify_skill(1)
     elif current_personality == 'Noble':
-        gain_gold(6)
+        modify_gold(6)
 
 
 def build_your_character():
@@ -383,19 +383,28 @@ def create_fight_dependent_room(room_entered):
     global fight_text
     global won_last_round
     global items
+    global past_rooms
     status_update = ''
     options = fight_room_choices[room_entered]
     enemy_list = pull_monsters(room_entered)
     # rooms where you just fight a monster or monsters
     if room_entered in [8, 16, 19, 20, 33, 61, 93, 108, 142, 143, 152, 179, 188, 199, 236, 240, 248, 251, 283,
                         289, 304, 309, 331, 333, 338, 365, 372, 196]:
-        for monster in enemy_list:
-            result = fight_monster(monster)
-            status_update = status_update + result
-        if current_stamina > 0:
-            generate_combat_log_image()
-            create_media_tweet(room_entered, status_update)
-            set_current_room(fight_room_choices[room_entered][0])
+        if room_entered == 179:
+            populate_past_rooms()
+            past_rooms.pop()
+            if 179 in past_rooms:
+                create_media_tweet(179, 'You find the room empty, and absentmindedly play with the red key as you leave'
+                                        'the room.')
+                set_current_room(54)
+        else:
+            for monster in enemy_list:
+                result = fight_monster(monster)
+                status_update = status_update + result
+            if current_stamina > 0:
+                generate_combat_log_image()
+                create_media_tweet(room_entered, status_update)
+                set_current_room(fight_room_choices[room_entered][0])
     # rooms where you gain 2 luck after defeating the first zombie, otherwise normal
     if room_entered in [13, 282]:
         for monster in enemy_list:
@@ -1147,7 +1156,7 @@ def create_luck_dependent_room(room_entered):
             if luck_result == 'lucky':
                 next_passage_choice = options[0]
                 gold_gained = (random.randint(1, 6) + random.randint(1, 6))
-                gain_gold(gold_gained)
+                modify_gold(gold_gained)
                 status_update = ("Your luck holds, you gain " + str(gold_gained) + " gold and continue "
                                                                                    "to passage " + str(options[0]))
             if luck_result == 'unlucky':
@@ -1853,7 +1862,7 @@ def create_special_passage_room(room_entered):
     # gain key 111 and such then fight barbarian
     if room_entered in [75]:
         keys.append(111)
-        gain_gold(50)
+        modify_gold(50)
         status_update = 'You stow away the key marked 111 and the jewel, you now have ' + str(current_gold) + ' gold. '
         hunger_check = check_to_eat()
         if hunger_check == 'hungry':
@@ -1906,7 +1915,7 @@ def create_special_passage_room(room_entered):
             create_poll_tweet(room_entered, status_update, poll_status)
     # gain ten gold then go to passage 319
     if room_entered in [110]:
-        gain_gold(10)
+        modify_gold(10)
         status_update = 'You eagerly collect the gold. You now have ' + str(current_gold) + ' gold.'
         items.append('boot gold')
         enter_passage_two_two_one('boot gold', status_update)
@@ -1961,7 +1970,7 @@ def create_special_passage_room(room_entered):
         player_result = (random.randint(1, 6) + random.randint(1, 6))
         gambler_result = (random.randint(1, 6) + random.randint(1, 6))
         if player_result > gambler_result:
-            gain_gold(bet)
+            modify_gold(bet)
             status_update = 'You bet ' + str(bet) + ' gold and won! You now have ' + str(current_gold) + ' gold.'
             modify_skill(2)
             modify_stamina(2)
@@ -1995,7 +2004,7 @@ def create_special_passage_room(room_entered):
         create_poll_tweet(room_entered, status_update, poll_status)
     # gain 1 gold and two luck then a poll
     if room_entered in [147]:
-        gain_gold(1)
+        modify_gold(1)
         modify_luck(2)
         status_update = "Mother always said it's lucky to let a mouse go... unless it's in the larder."
         poll_status = 'You now have ' + str(current_luck) + ' luck. Will you continue on, or try the door?'
@@ -2050,7 +2059,7 @@ def create_special_passage_room(room_entered):
             create_media_tweet(room_entered, status_update)
     # gain crucifix and 4 gold then go to passage 319
     if room_entered in [170]:
-        gain_gold(4)
+        modify_gold(4)
         status_update = 'You pocket the crucifix. You now have ' + str(current_gold) + ' gold.'
         items.append('crucifix')
         enter_passage_two_two_one('crucifix', status_update)
@@ -2103,13 +2112,13 @@ def create_special_passage_room(room_entered):
         create_poll_tweet(room_entered, status_update, poll_status)
     # gain 5 gold then a poll
     if room_entered in [196]:
-        gain_gold(5)
+        modify_gold(5)
         status_update = 'You now have ' + str(current_gold) + ' gold pieces.'
         poll_status = 'How best to cross the room?'
         create_poll_tweet(room_entered, status_update, poll_status)
     # gain gold and the invis potion, and may eat, then a poll
     if room_entered in [201]:
-        gain_gold(25)
+        modify_gold(25)
         items.append('potion of invisibility')
         hunger_result = check_to_eat()
         if hunger_result == 'hungry':
@@ -2355,7 +2364,7 @@ def create_special_passage_room(room_entered):
     # gain 2 gold and 2 luck then a poll
     if room_entered in [342]:
         modify_luck(2)
-        gain_gold(2)
+        modify_gold(2)
         status_update = 'You now have ' + str(current_luck) + ' luck and ' + str(current_gold) + ' gold.'
         poll_status = 'which way next?'
         create_poll_tweet(room_entered, status_update, poll_status)
@@ -2385,7 +2394,7 @@ def create_special_passage_room(room_entered):
             luck_test = test_your_luck()
             dice_result = (random.randint(1, 6) + random.randint(1, 6))
             if luck_test == 'lucky':
-                gain_gold(dice_result)
+                modify_gold(dice_result)
                 status_update = status_update + 'You decide to test your luck and it pulls through! ' \
                                                 'You gain ' + str(dice_result) + ' gold, up to ' + str(
                                                  current_gold) + '.'
