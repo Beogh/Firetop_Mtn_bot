@@ -397,6 +397,14 @@ def create_fight_dependent_room(room_entered):
                 create_media_tweet(179, 'You find the room empty, and absentmindedly play with the red key as you leave'
                                         'the room.')
                 set_current_room(54)
+            else:
+                for monster in enemy_list:
+                    result = fight_monster(monster)
+                    status_update = status_update + result
+                if current_stamina > 0:
+                    generate_combat_log_image()
+                    create_media_tweet(room_entered, status_update)
+                    set_current_room(fight_room_choices[room_entered][0])
         else:
             for monster in enemy_list:
                 result = fight_monster(monster)
@@ -959,6 +967,7 @@ def create_key_room(room_entered):
     global current_stamina
     global key_rooms
     global last_tweet_id
+    global keys
     # room 139: build from keys
     if room_entered in [139]:
         if len(keys) >= 3:
@@ -1459,13 +1468,16 @@ def create_random_fight_room(room_entered):
     if room_entered in [12]:
         # options = random_fight_room_choices[room_entered]
         monster = fight_room_161()
+        generate_combat_log_image()
         status_update = 'You defeat the ' + monster_dictionary[monster][2] + '!'
         create_poll_tweet(room_entered, status_update, 'Where to next?')
     # one choice after fighting 161
     if room_entered in [14, 161, 234, 295, 306]:
         options = random_fight_room_choices[room_entered]
         monster = fight_room_161()
-        status_update = 'You defeat the ' + monster + ' and continue to passage ' + str(options[0]) + '.'
+        generate_combat_log_image()
+        status_update = 'You defeat the ' + monster_dictionary[monster][2] + ' and continue to passage ' \
+                        + str(options[0]) + '.'
         create_media_tweet(room_entered, status_update)
         set_current_room(options[0])
 
@@ -2441,7 +2453,7 @@ def create_special_passage_room(room_entered):
         if die_result in [1, 2]:
             fight_monster(room_monster_dictionary[room_entered][0])
         elif die_result in [3, 4, 5, 6]:
-            fight_monster(room_monster_dictionary[room_entered][0])
+            fight_monster(room_monster_dictionary[room_entered][1])
         modify_luck(1)
         status_update = status_update + ' You gain 1 luck after defeating the piranhas.'
         hunger_check = check_to_eat()
