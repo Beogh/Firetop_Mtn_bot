@@ -1,4 +1,6 @@
 # fix the second run through of passage 212 to generate the correct images.
+# fix the stuff around passage 206 not recognizing you've been there before & the poll text the second
+# time you're there.
 import tweepy
 from secrets import *
 from player_stats import *
@@ -2176,6 +2178,8 @@ def create_special_passage_room(room_entered):
         create_poll_tweet(room_entered, status_update, poll_status)
     # if you've been to this room before, go to one passage, else go to another.
     if room_entered in [206]:
+        populate_past_rooms()
+        past_rooms.pop()
         if room_entered in past_rooms:
             status_update = 'You HAVE been here before...'
             create_media_tweet(room_entered, status_update)
@@ -2407,12 +2411,12 @@ def create_special_passage_room(room_entered):
             dice_result = (random.randint(1, 6) + random.randint(1, 6))
             if luck_test == 'lucky':
                 modify_gold(dice_result)
+                modify_luck(2)
                 status_update = status_update + 'You decide to test your luck and it pulls through! ' \
                                                 'You gain ' + str(dice_result) + ' gold, up to ' + str(
                                                  current_gold) + '.'
             elif luck_test == 'unlucky':
                 modify_gold(-dice_result)
-                modify_luck(2)
                 status_update = status_update + ' You decide to test your luck, but ' \
                                                 'it fails you! You now have ' + \
                                                 str(current_gold) + ' gold. You now have ' + \
@@ -2990,10 +2994,14 @@ def initialize_game():
         with open(each + ".txt", 'wt') as wipe_clean:
             wipe_clean.close()
     with open('room_path.txt', 'at') as set_room_zero:
-        set_room_zero.write('0\n')
+        set_room_zero.write('0\n0\n')
     with open('items.txt' 'at') as create_item_list:
         for each in basic_items:
             create_item_list.write(each + '\n')
+    with open('initial_character_stats.txt', 'at') as reset_initial_stats:
+        reset_initial_stats.write('12\n18\n12\n0\n10\n')
+    with open('current_character_stats.txt', 'at') as reset_current_stats:
+        reset_current_stats.write('12\n18\n12\n0\n10\n')
 
 
 def lose_stamina(loss_amt, room_entered, tweet_status):
