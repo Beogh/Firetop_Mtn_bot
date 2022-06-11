@@ -166,3 +166,6 @@ The character will move through the dungeon until there is a notable event (usua
 
 
 More to come as questions arise. If you have any questions, DM @digitalmaxine on twitter.
+
+Manual Repository of Final Run Tweets:
+Run 1: https://twitter.com/twtt_rpg/status/1535009850031235084?s=20&t=Ur6oi5t6Hj_8V6dppTTwqw
