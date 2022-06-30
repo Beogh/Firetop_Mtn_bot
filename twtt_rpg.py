@@ -3316,7 +3316,7 @@ def test_reduce_damage(damage_to_take, enemy_skill):
     global current_personality
     global current_stamina
     global current_luck
-    if damage_to_take >= current_stamina:
+    if damage_to_take >= current_stamina != 1:
         return test_your_luck()
     elif current_personality == 'Soldier':
         if ((current_stamina - damage_to_take) % 2) == 0 and current_luck > 9 and enemy_skill > (current_skill + 1):
@@ -3362,7 +3362,7 @@ def test_your_luck():
     dice_result = (random.randint(1, 6) + random.randint(1, 6))
     if dice_result <= current_luck:
         current_luck -= 1
-        if current_luck < 7 and ('Potion of Fortune' in items or 'Half Potion of Fortune' in items):
+        if current_luck < 5 and ('Potion of Fortune' in items or 'Half Potion of Fortune' in items):
             initial_luck += 1
             current_luck = initial_luck
             fight_text.append('You quaff a measure of your potion. You now have ' + str(current_luck) + ' luck.')
@@ -3376,7 +3376,7 @@ def test_your_luck():
         return 'lucky'
     if dice_result > current_luck:
         current_luck -= 1
-        if current_luck < 7 and ('Potion of Fortune' in items or 'Half Potion of Fortune' in items):
+        if current_luck < 5 and ('Potion of Fortune' in items or 'Half Potion of Fortune' in items):
             initial_luck += 1
             current_luck = initial_luck
             fight_text.append('You quaff a measure of your potion. You now have ' + str(current_luck) + ' luck.')
