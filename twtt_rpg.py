@@ -1,7 +1,7 @@
-# fix the second run through of passage 212 to generate the correct images.
-# fix the stuff around passage 206 not recognizing you've been there before & the poll text the second
-# time you're there.
+# todo: fix the second run through of passage 221 to generate the correct images. change the "you defeated"
+#  tweet text to be a little cleaner and such.
 import tweepy
+from datetime import datetime
 from secrets import *
 from player_stats import *
 import glob
@@ -34,6 +34,7 @@ potion_chosen = ''
 chosen_difficulty = ''
 current_room = 0
 won_last_round = 'no'
+poll_duration = 0
 items = []
 keys = []
 past_rooms = []
@@ -837,21 +838,31 @@ def create_item_dependent_room(room_entered):
         if 'Y-shaped stick' in items:
             available_passages.append(215)
         if len(available_passages) == 5:
-            status_update = 'Your Y-shaped stick broke while in your rucksack. '
+            status_update = 'Your Y-shaped stick broke while in your rucksack! '
             available_passages.remove(215)
-        status_update = status_update + 'what item will fare best?'
-        media_tweet = create_media_tweet(room_entered, status_update)
-        poll_status = 'You weigh your options...'
-        poll_tweet = client.create_tweet(text=poll_status, in_reply_to_tweet_id=media_tweet.data['id'],
-                                         poll_options=available_passages, poll_duration_minutes=359)
-        last_tweet_id = poll_tweet.data['id']
+        if len(available_passages) > 1:
+            status_update = status_update + 'What item will fare best?'
+            media_tweet = create_media_tweet(room_entered, status_update)
+            poll_status = 'You weigh your options...'
+            poll_tweet = client.create_tweet(text=poll_status, in_reply_to_tweet_id=media_tweet.data['id'],
+                                             poll_options=available_passages, poll_duration_minutes=359)
+            last_tweet_id = poll_tweet.data['id']
+        if len(available_passages) == 0:
+            status_update = status_update + "You don't have any of these items... You return to passage 358."
+            create_media_tweet(room_entered, status_update)
+            set_current_room(358)
+        if len(available_passages) == 1:
+            status_update = status_update + "With only one option available, you move to passage " + \
+                            str(available_passages[0]) + '.'
+            create_media_tweet(room_entered, status_update)
+            set_current_room(available_passages[0])
     # check if you have the anti-dragon spell
     if room_entered in [126]:
-        if 'fireball' in items:
+        if 'dragonfire' in items:
             status_update = 'You recall the spell written on parchment.'
             create_media_tweet(room_entered, status_update)
             set_current_room(options[1])
-        if 'fireball' not in items:
+        if 'dragonfire' not in items:
             status_update = "The name doesn't ring a ball. Continue to passage " + str(options[0])
             create_media_tweet(room_entered, status_update)
             set_current_room(options[0])
@@ -1453,7 +1464,7 @@ def create_provisions_dependent_room(room_entered):
         create_media_tweet(room_entered, status_update)
         set_current_room(options[0])
     # eating provisions is a passage choice
-    if room_entered in [69, 76, 136, 244, 351]:
+    if room_entered in [58, 69, 76, 136, 244, 351]:
         if current_provisions >= 1:
             status_update = 'You have enough provisions to eat. Your stamina is ' \
                             + str(current_stamina) + ' and your initial stamina is ' + str(initial_stamina) + '.'
@@ -1714,17 +1725,12 @@ def create_special_passage_room(room_entered):
         create_poll_tweet(room_entered, status_update, poll_status)
     # gain two extra stamina by eating and 1 skill then a poll
     if room_entered in [15]:
-        hunger_check = check_to_eat()
-        if hunger_check == 'hungry':
-            eat_provisions()
-            modify_stamina(2)
-            modify_skill(1)
-            status_update = 'You relax your shoulders and rest a moment. You now have ' \
-                            + str(current_stamina) + ' stamina and ' + str(current_skill) + ' skill.'
-        if hunger_check == 'not hungry':
-            modify_skill(1)
-            status_update = 'You choose not to tarry, so you head on with ' \
-                            + str(current_stamina) + ' stamina and ' + str(current_skill) + ' skill.'
+        eat_provisions()
+        modify_stamina(2)
+        modify_skill(1)
+        status_update = 'You relax your shoulders and rest a moment. You now have ' \
+                        + str(current_stamina) + ' stamina and ' + str(current_skill) + ' skill.'
+        modify_skill(1)
         poll_status = 'You collect your things and head off to the west... or was it the east?'
         create_poll_tweet(room_entered, status_update, poll_status)
     # room 24 updates you that the wight has drained a skill point and allows a choice to flee
@@ -2050,14 +2056,13 @@ def create_special_passage_room(room_entered):
         create_poll_tweet(room_entered, status_update, poll_status)
     # poll, then if trying to leave you must test luck
     if room_entered in [159]:
-        # current_choices = ['attack', 'sneak out']
+        current_choices = ['attack', 'sneak out']
         status_update = 'Stay and fight, or try to sneak away? You current luck is ' + str(current_luck) + '.'
         poll_status = 'Can you take them on ' \
                       'with ' + str(current_skill) + ' skill and ' + str(current_stamina) + ' stamina?'
         media_tweet = create_media_tweet(room_entered, status_update)
-        options = ['365', '237', '365']
         poll_tweet = client.create_tweet(text=poll_status, in_reply_to_tweet_id=media_tweet.data['id'],
-                                         poll_options=options, poll_duration_minutes=359)
+                                         poll_options=current_choices, poll_duration_minutes=359)
         last_tweet_id = poll_tweet.data['id']
     # test luck, maybe losing 1 stamina, then a fight with a giant
     if room_entered in [163]:
@@ -2141,7 +2146,7 @@ def create_special_passage_room(room_entered):
                             + str(current_provisions) + ' provisions remaining.'
             poll_status = 'To the north, or eastwards?'
         else:
-            status_update = "You aren't hungry enough to eat. You have " + str(current_stamina) + 'stamina and ' \
+            status_update = "You aren't hungry enough to eat. You have " + str(current_stamina) + ' stamina and ' \
                             + str(current_provisions) + ' provisions remaining.' + " You stow your new potion. "
             poll_status = 'Which direction do you feel in your bones?'
         status_update = status_update + 'You now have ' + str(current_gold) + ' gold.'
@@ -2180,7 +2185,7 @@ def create_special_passage_room(room_entered):
     if room_entered in [206]:
         populate_past_rooms()
         past_rooms.pop()
-        if room_entered in past_rooms:
+        if str(room_entered) in past_rooms:
             status_update = 'You HAVE been here before...'
             create_media_tweet(room_entered, status_update)
             set_current_room(options[0])
@@ -2227,7 +2232,9 @@ def create_special_passage_room(room_entered):
         create_poll_tweet(room_entered, status_update, poll_status)
     # dwarf room, 4 choices but only if you haven't been there before
     if room_entered in [227]:
-        if room_entered in past_rooms:
+        populate_past_rooms()
+        past_rooms.pop()
+        if str(room_entered) in past_rooms:
             status_update = 'The room is eerily void. You move on to passage 291.'
             create_media_tweet(room_entered, status_update)
             set_current_room(291)
@@ -3012,7 +3019,8 @@ def lose_stamina(loss_amt, room_entered, tweet_status):
     global fight_text
     current_stamina -= loss_amt
     if current_stamina <= 0:
-        if current_personality == 'Berserker':
+        if current_personality == 'Berserker' and ('Potion of Strength' not in items and 'Half Potion of Strength'
+                                                   not in items):
             death_defy_result = test_to_defy_death()
             if death_defy_result == 'alive':
                 current_stamina = 1
@@ -3032,13 +3040,18 @@ def lose_stamina(loss_amt, room_entered, tweet_status):
                 elif 'Half Potion of Strength' in items:
                     fight_text.append('You have used the last of your potion.')
                     items.remove('Half Potion of Strength')
-            tweet_status = tweet_status + ' This has proven fatal. You will need to start over.'
-            if len(tweet_status) > 280:
-                tweet_status = 'You have met your end here, succumbing to your injuries. You will need to start over.'
-            create_media_tweet(room_entered, tweet_status)
-            set_current_room(0)
-            initialize_game()
-            return 'dead'
+                return 'not dead'
+            elif current_stamina <= 0:
+                tweet_status = tweet_status + ' This has proven fatal. You will need to start over.'
+                if len(tweet_status) > 280 and current_stamina <= 0:
+                    tweet_status = 'You have met your end here, succumbing to your injuries. ' \
+                                   'You will need to start over.'
+                if len(fight_text) > 0:
+                    generate_combat_log_image()
+                create_media_tweet(room_entered, tweet_status)
+                set_current_room(0)
+                initialize_game()
+                return 'dead'
     else:
         return 'not dead'
 
@@ -3246,7 +3259,7 @@ def set_initial_stats(difficulty_chosen):
         initial_provisions = 7
     elif difficulty_chosen == 'Very Hard':
         initial_skill = 8
-        initial_stamina = 14
+        initial_stamina = 10
         initial_luck = 8
         initial_gold = 0
         initial_provisions = 6
@@ -3257,6 +3270,16 @@ def set_initial_stats(difficulty_chosen):
     current_provisions = initial_provisions
     update_initial_character_stats()
     update_character_stats()
+
+
+def set_poll_duration():
+    global poll_duration
+    now = datetime.now()
+    current_hour = now.strftime("%H")
+    if current_hour in ['23', '0', '1']:
+        poll_duration = 719
+    else:
+        poll_duration = 359
 
 
 def test_to_defy_death():
@@ -3480,14 +3503,14 @@ def next_step(chosen_room):
         potion_choice = get_poll_results(last_tweet_id)
         handle_special_results(potion_choice)
     else:
-        if chosen_room not in ['fight on!', 'Test your luck!']:
+        if chosen_room not in ['fight on!', 'Test your luck!', 'Test Luck!!']:
             chosen_room = int(chosen_room)
         work_from_tweet = media_or_poll_result()
         if work_from_tweet == 'poll tweet':
             results = get_poll_results(last_tweet_id)
         else:
             results = chosen_room
-        if results in ['fight on!', 'Test your luck!'] or results in items:
+        if results in ['fight on!', 'Test your luck!', 'Test Luck!!'] or results in items:
             handle_special_results(results)
         else:
             results = int(results)
